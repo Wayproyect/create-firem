@@ -1,0 +1,42 @@
+name: Auto Update Template Packages
+
+on:
+  schedule:
+    # Run every Monday at 15:00 UTC (9:00 AM UTC-6)
+    - cron: '0 15 * * 1'
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  contents: write
+
+jobs:
+  update-packages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install CLI Dependencies
+        run: npm ci || npm install
+
+      - name: Run Update Script
+        run: node scripts/auto-update-packages.js
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          # Check if there are staged changes to commit
+          if ! git diff-index --quiet HEAD; then
+            git commit -m "chore: auto-update template dependencies and bump version"
+            git push origin HEAD
+          else
+            echo "No updates found. Repository is already up-to-date."
+          fi
