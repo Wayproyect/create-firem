@@ -1,6 +1,6 @@
 {
   "name": "create-firem",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Scaffold a new React + Firebase + Material-UI project",
   "main": "bin/index.js",
   "bin": {
